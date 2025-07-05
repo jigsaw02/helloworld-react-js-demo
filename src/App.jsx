@@ -1,8 +1,21 @@
-import { useState } from 'react'
-import './App.css'
+import { useState, useEffect } from 'react';
+import './App.css';
 
 function App() {
-  const [htmlInput, setHtmlInput] = useState('<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Sample Page</title>\n</head>\n<body>\n  <h1>Hello from your HTML!</h1>\n  <p>This is a sample paragraph.</p>\n</body>\n</html>');
+  const [htmlInput, setHtmlInput] = useState(
+    '<!DOCTYPE html>\n<html lang="en">\n<head>\n  <meta charset="UTF-8">\n  <meta name="viewport" content="width=device-width, initial-scale=1.0">\n  <title>Sample Page</title>\n</head>\n<body>\n  <h1>Hello from your HTML!</h1>\n  <p>This is a sample paragraph.</p>\n  <script>alert("Hello from your script!");</script>\n</body>\n</html>'
+  );
+  const [iframeSrc, setIframeSrc] = useState('');
+
+  useEffect(() => {
+    const blob = new Blob([htmlInput], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    setIframeSrc(url);
+
+    return () => {
+      URL.revokeObjectURL(url);
+    };
+  }, [htmlInput]);
 
   const handleInputChange = (event) => {
     setHtmlInput(event.target.value);
@@ -20,13 +33,15 @@ function App() {
       </div>
       <div className="render-pane">
         <h2>Rendered Output</h2>
-        <div
+        <iframe
           className="render-view"
-          dangerouslySetInnerHTML={{ __html: htmlInput }}
+          src={iframeSrc}
+          title="Rendered HTML"
+          sandbox="allow-scripts"
         />
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
